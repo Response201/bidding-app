@@ -1,7 +1,12 @@
 
-import { ChangeEvent } from 'react';
+
+import { ChangeEvent, useState} from 'react';
+
 import { Product } from '../models/Product';
-import moment from 'moment';
+import moment from "moment-timezone"
+moment.tz.setDefault('Europe/Stockholm');
+  moment.locale('sv');
+
 
 
 
@@ -18,22 +23,23 @@ setHighestBidUser:(highestBidUser:string) => void
 setHighestBid:(highestBid:number) => void
 highestBidUser:string
  highestBid:number
+timeLeft:string
+
 }
 
-export const DisplayProduct = ({message, userName, setUserName, currentBid, setCurrentBid, makeBid, selectedProduct, setHighestBidUser, setHighestBid, highestBidUser, highestBid}:Props) => {
 
-  moment.locale('sw'); // set this instance to use French
-  const l =moment().format('LLLL'); // dimanche 15 juillet 2012 11:01
-console.log(l)
-    const m = moment(selectedProduct.ending, "YYYY-MM-DD").fromNow();
 
+
+export const DisplayProduct = ({timeLeft,  message, userName, setUserName, currentBid, setCurrentBid, makeBid, selectedProduct, setHighestBidUser, setHighestBid, highestBidUser, highestBid, }:Props) => {
+
+const [showWinner, setShowWinner] = useState<boolean>(false)
 
     if(highestBidUser && highestBid){
 setHighestBidUser('')
 setHighestBid(0)
 }
 
-    if(selectedProduct.bids.length >= 1 && highestBidUser && highestBidUser){
+    if(selectedProduct.bids.length >= 1 ){
 selectedProduct.bids.sort((a, b) =>{return b.amount - a.amount})
 setHighestBidUser(selectedProduct.bids[0].bidder)
 setHighestBid(selectedProduct.bids[0].amount)
@@ -42,13 +48,52 @@ setHighestBid(selectedProduct.bids[0].amount)
 
 
 
-
-
-
-
-
-  return  (       
+  return  ( 
+    <> 
  
+{showWinner ?   <>
+
+
+  {selectedProduct.bids.map((bid, i) => {
+       if(i <= 0 ){
+
+return(
+        <h2 key={i} className='selectedProduct___li'>
+     Vinnare av {selectedProduct.name} är {bid.uniqUser}  {bid.amount}kr 
+      </h2>
+
+)
+
+
+       }}
+         
+       )}
+
+
+
+
+
+
+
+
+
+
+ </> :     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <>
 
 
@@ -67,16 +112,30 @@ setHighestBid(selectedProduct.bids[0].amount)
    value={currentBid}
    onChange={(e:ChangeEvent<HTMLInputElement>) => setCurrentBid(+e.target.value)}
  /> 
- <button onClick={  makeBid}>Lägg bud</button>
- <section>
+ <button onClick={makeBid}>Lägg bud</button> 
+ 
+
+
+ <h3>{selectedProduct.name}</h3>
+
+ <p> Aktion avslutas {timeLeft}  </p>
+
+</>
+
+}
+
+ 
+
+<section>
    <div>
-     <h3>{selectedProduct.name}</h3> <p> Aktion avslutas om: { m } </p>
+   
      <ul>
        {selectedProduct.bids.map((bid, i) => {
-       if(i <= 2){
+       if(i <= 2 ){
+
 return(
         <li key={i} className='selectedProduct___li'>
-        {bid.amount} - bidder {i+1} - {bid.time}
+    {bid.amount}kr  {bid.uniqUser}   {bid.time}
       </li>
 
 )
@@ -90,7 +149,13 @@ return(
     
    </div>
  </section>
+
+
+
+
+
 </>
+
 )
 }
 

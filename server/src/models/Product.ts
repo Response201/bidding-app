@@ -9,4 +9,5 @@ export type Product = {
   highestBidder: string;
   ending:string
   bids: Bid[];
+  
 };

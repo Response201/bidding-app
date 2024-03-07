@@ -3,4 +3,5 @@ export type Bid = {
   productId: string;
   bidder: string;
   time:string
+  uniqUser:string
 };
